@@ -11,5 +11,9 @@ class MainViewModel : ViewModel(){
 
     var angel = mutableStateOf(0.0)
 
+    private val clock = Clock()
 
+    fun calc(){
+        angel.value = clock.getAngle(hours.value, minutes.value)
+    }
 }

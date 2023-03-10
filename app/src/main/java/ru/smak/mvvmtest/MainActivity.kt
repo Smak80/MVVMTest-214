@@ -6,11 +6,15 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import ru.smak.mvvmtest.ui.theme.MVVMTestTheme
 
@@ -26,13 +30,37 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background
                 ) {
                     Column(Modifier.fillMaxWidth()) {
-                        Text(text = stringResource(id = R.string.enter_time_label))
-                        Input(mvm.hours.value.toString(), Modifier.fillMaxWidth())
-                        Input(mvm.minutes.value.toString(), Modifier.fillMaxWidth())
-                        ElevatedButton(onClick = {}) {
+                        Text(
+                            modifier = Modifier.padding(8.dp, 12.dp),
+                            text = stringResource(id = R.string.enter_time_label)
+                        )
+                        Input(
+                            mvm.hours,
+                            Modifier
+                                .fillMaxWidth()
+                                .padding(8.dp, 12.dp),
+                            maxValue = 23U)
+                        Input(
+                            mvm.minutes,
+                            Modifier
+                                .fillMaxWidth()
+                                .padding(8.dp, 12.dp)
+                        )
+                        ElevatedButton(onClick = {
+                                mvm.calc()
+                            },
+                            colors = ButtonDefaults.elevatedButtonColors(
+                                containerColor = MaterialTheme.colorScheme.primary,
+                                contentColor = MaterialTheme.colorScheme.onPrimary,
+                            ),
+                            modifier = Modifier.align(Alignment.CenterHorizontally)
+                        ) {
                             Text(text = stringResource(id = R.string.calc))
                         }
-                        ru.smak.mvvmtest.Result(value = mvm.angel.value)
+                        Result(
+                            value = mvm.angel.value,
+                            modifier = Modifier.padding(8.dp, 12.dp)
+                        )
                     }
                 }
             }
@@ -42,12 +70,14 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun Input(
-    value: String,
+    value: MutableState<UInt>,
     modifier: Modifier = Modifier,
+    minValue: UInt = 0U,
+    maxValue: UInt = 59U,
 ){
     OutlinedTextField(
-        value = value,
-        onValueChange = { },
+        value = value.value.toString(),
+        onValueChange = { value.value = (it.toUIntOrNull() ?: 0U).coerceIn(minValue..maxValue) },
         modifier = modifier,
     )
 }
@@ -63,13 +93,13 @@ fun Result(
     )
 }
 
-@Preview(showBackground = true)
-@Composable
-fun InputPreview() {
-    MVVMTestTheme {
-        Input("12")
-    }
-}
+//@Preview(showBackground = true)
+//@Composable
+//fun InputPreview() {
+//    MVVMTestTheme {
+//        Input("12")
+//    }
+//}
 
 @Preview(showBackground = true)
 @Composable
